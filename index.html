@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Invoice Generator | Simple & Professional</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    .header p {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    
+    .form-container {
+      padding: 40px;
+    }
+    
+    .section {
+      margin-bottom: 32px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1f2937;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .items-section {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .item-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 40px;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: end;
+    }
+    
+    .remove-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      height: 42px;
+    }
+    
+    .remove-btn:hover {
+      background: #dc2626;
+    }
+    
+    .add-item-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .add-item-btn:hover {
+      background: #059669;
+    }
+    
+    .total-section {
+      text-align: right;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+    }
+    
+    .total-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    
+    .total-row .label {
+      margin-right: 20px;
+      color: #6b7280;
+    }
+    
+    .total-row.grand-total {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+      margin-top: 12px;
+    }
+    
+    .generate-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 32px;
+      transition: transform 0.2s;
+    }
+    
+    .generate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: #f9fafb;
+      color: #6b7280;
+      font-size: 13px;
+    }
+    
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+    }
+    
+    @media (max-width: 640px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .item-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .remove-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📄 Free Invoice Generator</h1>
+      <p>Create professional invoices in seconds. No signup required.</p>
+    </div>
+    
+    <div class="form-container">
+      <!-- Your Info -->
+      <div class="section">
+        <div class="section-title">Your Information</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="yourName">Your Name / Business</label>
+            <input type="text" id="yourName" placeholder="John Doe" required>
+          </div>
+          <div class="form-group">
+            <label for="yourEmail">Email</label>
+            <input type="email" id="yourEmail" placeholder="john@example.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="yourAddress">Address</label>
+          <textarea id="yourAddress" placeholder="123 Main St, City, State 12345"></textarea>
+        </div>
+      </div>
+      
+      <!-- Client Info -->
+      <div class="section">
+        <div class="section-title">Bill To</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="clientName">Client Name</label>
+            <input type="text" id="clientName" placeholder="Acme Corp" required>
+          </div>
+          <div class="form-group">
+            <label for="clientEmail">Client Email</label>
+            <input type="email" id="clientEmail" placeholder="client@acme.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="clientAddress">Client Address</label>
+          <textarea id="clientAddress" placeholder="456 Business Rd, City, State 67890"></textarea>
+        </div>
+      </div>
+      
+      <!-- Invoice Details -->
+      <div class="section">
+        <div class="section-title">Invoice Details</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="invoiceNumber">Invoice Number</label>
+            <input type="text" id="invoiceNumber" placeholder="#INV-001" required>
+          </div>
+          <div class="form-group">
+            <label for="invoiceDate">Date</label>
+            <input type="date" id="invoiceDate" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dueDate">Due Date</label>
+            <input type="date" id="dueDate">
+          </div>
+          <div class="form-group">
+            <label for="currency">Currency</label>
+            <input type="text" id="currency" placeholder="USD" value="USD">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Items -->
+      <div class="section">
+        <div class="section-title">Items / Services</div>
+        <div class="items-section" id="itemsContainer">
+          <!-- Item rows will be added here -->
+        </div>
+        <button class="add-item-btn" onclick="addItem()">+ Add Item</button>
+        
+        <div class="total-section">
+          <div class="total-row">
+            <span class="label">Subtotal:</span>
+            <span id="subtotal">$0.00</span>
+          </div>
+          <div class="total-row grand-total">
+            <span class="label">Total:</span>
+            <span id="total">$0.00</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Notes -->
+      <div class="section">
+        <div class="form-group">
+          <label for="notes">Notes (Optional)</label>
+          <textarea id="notes" placeholder="Payment terms, thank you message, etc."></textarea>
+        </div>
+      </div>
+      
+      <button class="generate-btn" onclick="generatePDF()">Generate Invoice PDF</button>
+    </div>
+    
+    <div class="footer">
+      Free forever • No data stored • <a href="#upgrade">Upgrade to Pro</a> for custom branding ($5)
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
